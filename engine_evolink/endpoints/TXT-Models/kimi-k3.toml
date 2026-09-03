@@ -1,0 +1,19 @@
+id = "kimi-k3"
+label = "Kimi K3"
+category = "TXT"
+platform = "evolink"
+endpoint = "kimi-k3"
+description = "Moonshot Kimi K3. Reasoning model with 256K context. OpenAI-compatible chat completions (synchronous)."
+
+[params.max_completion_tokens]
+label = "Max Output Tokens"
+type = "integer"
+default = 131072
+
+[params.reasoning_effort]
+label = "Reasoning Effort"
+type = "select"
+default = "max"
+options = [
+  { value = "max", label = "Max · Default" },
+]

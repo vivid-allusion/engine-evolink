@@ -1,0 +1,55 @@
+id = "kling-v3-image-to-video"
+label = "Kling V3 Image to Video"
+category = "VID"
+platform = "evolink"
+endpoint = "kling-v3-image-to-video"
+description = "Kuaishou Kling V3. Image-to-video with optional start/end frames and sound effects. Asynchronous task API."
+
+[general]
+reference_param = "image_start"
+
+[params.negative_prompt]
+label = "Negative Prompt"
+type = "text"
+optional = true
+default = ""
+
+[params.duration]
+label = "Duration (seconds)"
+type = "integer"
+default = 5
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "720p"
+options = [
+  { value = "720p",  label = "720p · Standard" },
+  { value = "1080p", label = "1080p · Full HD" },
+  { value = "4k",    label = "4K · Maximum" },
+]
+
+[params.sound]
+label = "Sound Effects"
+type = "select"
+default = "off"
+options = [
+  { value = "off", label = "Off · Default" },
+  { value = "on",  label = "On" },
+]
+
+[params."model_params.multi_shot"]
+label = "Multi-Shot Mode"
+type = "boolean"
+default = false
+hidden = true
+
+[params."model_params.shot_type"]
+label = "Shot Type"
+type = "select"
+default = "intelligence"
+hidden = true
+options = [
+  { value = "intelligence", label = "Intelligence" },
+  { value = "customize",    label = "Customize" },
+]

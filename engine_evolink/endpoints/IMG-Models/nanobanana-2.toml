@@ -1,0 +1,64 @@
+id = "nanobanana-2"
+label = "Nano Banana 2"
+category = "IMG"
+platform = "evolink"
+endpoint = "gemini-3.1-flash-image-preview"
+description = "Gemini 3.1 Flash Image preview. Text-to-image, image-to-image and image editing. Asynchronous task API; up to 14 reference images (max 4 real-person images), 20MB each."
+
+[params.size]
+label = "Aspect Ratio"
+type = "select"
+default = "auto"
+optional = true
+options = [
+  { value = "auto", label = "Auto" },
+  { value = "1:1",   label = "1:1 · Square" },
+  { value = "1:4",   label = "1:4 · Tall Vertical" },
+  { value = "4:1",   label = "4:1 · Wide Panorama" },
+  { value = "1:8",   label = "1:8 · Extreme Vertical" },
+  { value = "8:1",   label = "8:1 · Extreme Panorama" },
+  { value = "2:3",   label = "2:3 · Portrait" },
+  { value = "3:2",   label = "3:2 · Landscape" },
+  { value = "3:4",   label = "3:4 · Portrait" },
+  { value = "4:3",   label = "4:3 · Classic" },
+  { value = "4:5",   label = "4:5 · Portrait" },
+  { value = "5:4",   label = "5:4 · Landscape" },
+  { value = "9:16",  label = "9:16 · Vertical" },
+  { value = "16:9",  label = "16:9 · Landscape · Standard" },
+  { value = "21:9",  label = "21:9 · Ultrawide · Cinematic" },
+]
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "2K"
+options = [
+  { value = "0.5K", label = "0.5K · Fastest" },
+  { value = "1K",   label = "1K · Standard" },
+  { value = "2K",   label = "2K · High Quality · Default" },
+  { value = "4K",   label = "4K · Maximum" },
+]
+note = "Different quality levels have different pricing"
+
+[params."model_params.web_search"]
+label = "Web Search Grounding"
+type = "boolean"
+default = false
+hidden = true
+
+[params."model_params.image_search"]
+label = "Image Search Grounding"
+type = "boolean"
+default = false
+hidden = true
+
+[params."model_params.thinking_level"]
+label = "Thinking Level"
+type = "select"
+default = "auto"
+hidden = true
+options = [
+  { value = "auto", label = "Auto · Default" },
+  { value = "min",  label = "Min · Fastest" },
+  { value = "high", label = "High · Best Quality" },
+]

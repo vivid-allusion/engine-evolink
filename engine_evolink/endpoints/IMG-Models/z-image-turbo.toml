@@ -1,0 +1,35 @@
+id = "z-image-turbo"
+label = "Z Image Turbo"
+category = "IMG"
+platform = "evolink"
+endpoint = "z-image-turbo"
+description = "Zhipu Z Image Turbo. Fast text-to-image generation. Asynchronous task API."
+
+[params.size]
+label = "Aspect Ratio"
+type = "select"
+default = "1:1"
+optional = true
+options = [
+  { value = "1:1",  label = "1:1 · Square" },
+  { value = "2:3",  label = "2:3 · Portrait" },
+  { value = "3:2",  label = "3:2 · Landscape" },
+  { value = "3:4",  label = "3:4 · Portrait" },
+  { value = "4:3",  label = "4:3 · Classic" },
+  { value = "9:16", label = "9:16 · Vertical" },
+  { value = "16:9", label = "16:9 · Landscape" },
+  { value = "1:2",  label = "1:2 · Tall" },
+  { value = "2:1",  label = "2:1 · Wide" },
+]
+
+[params.seed]
+label = "Random Seed"
+type = "integer"
+optional = true
+hidden = true
+
+[params.nsfw_check]
+label = "NSFW Check"
+type = "boolean"
+default = false
+hidden = true

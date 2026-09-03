@@ -1,0 +1,57 @@
+id = "gpt-image-2"
+label = "GPT Image 2"
+category = "IMG"
+platform = "evolink"
+endpoint = "gpt-image-2"
+description = "OpenAI GPT Image 2. Text-to-image and image-to-image/editing with masking. Asynchronous task API; reference images via image_urls, optional mask via mask_url."
+
+[params.size]
+label = "Aspect Ratio"
+type = "text"
+default = "auto"
+optional = true
+description = "Output size/aspect ratio (e.g. 1024x1024, 16:9) or auto"
+
+[params.resolution]
+label = "Resolution"
+type = "select"
+default = "1K"
+options = [
+  { value = "1K", label = "1K · Standard" },
+  { value = "2K", label = "2K · High Quality" },
+  { value = "4K", label = "4K · Maximum" },
+]
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "medium"
+options = [
+  { value = "low",    label = "Low · Fast" },
+  { value = "medium", label = "Medium · Default" },
+  { value = "high",   label = "High · Best Quality" },
+]
+
+[params.background]
+label = "Background"
+type = "select"
+default = "opaque"
+hidden = true
+options = [
+  { value = "opaque",      label = "Opaque · Default" },
+  { value = "transparent", label = "Transparent" },
+]
+
+[params.n]
+label = "Number of Images"
+type = "integer"
+default = 1
+optional = true
+
+[params.mask_url]
+label = "Mask Image URL"
+type = "text"
+optional = true
+hidden = true
+default = ""
+description = "URL of the mask image for targeted editing"

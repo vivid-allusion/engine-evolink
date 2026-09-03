@@ -1,0 +1,40 @@
+id = "deepseek-v4-pro"
+label = "DeepSeek V4 Pro"
+category = "TXT"
+platform = "evolink"
+endpoint = "deepseek-v4-pro"
+description = "DeepSeek V4 Pro. Deep-reasoning LLM with 1M context, 384K max output; returns reasoning_content. OpenAI-compatible chat completions (synchronous)."
+
+[params."thinking.type"]
+label = "Thinking Mode"
+type = "select"
+default = "enabled"
+options = [
+  { value = "enabled",  label = "Enabled · Default" },
+  { value = "disabled", label = "Disabled" },
+]
+
+[params."thinking.reasoning_effort"]
+label = "Reasoning Effort"
+type = "select"
+default = "medium"
+options = [
+  { value = "low",    label = "Low" },
+  { value = "medium", label = "Medium · Default" },
+  { value = "high",   label = "High" },
+]
+
+[params.temperature]
+label = "Temperature"
+type = "number"
+default = 1.0
+
+[params.top_p]
+label = "Top P"
+type = "number"
+default = 1.0
+
+[params.max_tokens]
+label = "Max Output Tokens"
+type = "integer"
+default = 4096

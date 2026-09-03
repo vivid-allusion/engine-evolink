@@ -1,0 +1,29 @@
+id = "sora-2-pro-preview"
+label = "Sora 2 Pro Preview"
+category = "VID"
+platform = "evolink"
+endpoint = "sora-2-pro-preview"
+description = "OpenAI Sora 2 Pro (preview). Text-to-video and image-to-video. Asynchronous task API; reference images via image_urls."
+
+[params.aspect_ratio]
+label = "Aspect Ratio"
+type = "select"
+default = "16:9"
+options = [
+  { value = "16:9", label = "16:9 · Landscape" },
+  { value = "9:16", label = "9:16 · Vertical" },
+]
+
+[params.duration]
+label = "Duration (seconds)"
+type = "integer"
+default = 4
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "720p"
+options = [
+  { value = "720p",  label = "720p · Standard" },
+  { value = "1080p", label = "1080p · Full HD" },
+]

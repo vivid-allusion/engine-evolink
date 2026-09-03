@@ -1,0 +1,37 @@
+id = "seedream-4.5"
+label = "Seedream 4.5"
+category = "IMG"
+platform = "evolink"
+endpoint = "doubao-seedream-4.5"
+description = "Doubao Seedream 4.5. Text-to-image and image-to-image. Asynchronous task API; reference images via image_urls."
+
+[params.n]
+label = "Number of Images"
+type = "integer"
+default = 1
+optional = true
+
+[params.size]
+label = "Aspect Ratio"
+type = "text"
+default = "auto"
+optional = true
+description = "Aspect ratio of the generated image (e.g. 16:9, 1:1, 9:16) or auto"
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "2K"
+options = [
+  { value = "2K", label = "2K · Standard" },
+  { value = "4K", label = "4K · High Quality" },
+]
+
+[params.prompt_priority]
+label = "Prompt Priority"
+type = "select"
+default = "standard"
+hidden = true
+options = [
+  { value = "standard", label = "Standard" },
+]

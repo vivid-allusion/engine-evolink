@@ -1,0 +1,5 @@
+PROVIDER_NAME = "Evolink.AI"
+PROVIDER_HOMEPAGE = "https://evolink.ai"
+PLATFORM = "evolink"
+API_KEY_ENV_VAR = "EVOLINK_API_KEY"
+API_KEY_PATTERN = r".+"

@@ -1,0 +1,52 @@
+id = "grok-imagine-image-2.0"
+label = "Grok Imagine Image 2.0"
+category = "IMG"
+platform = "evolink"
+endpoint = "grok-imagine-image-2.0"
+description = "xAI Grok Imagine Image 2.0. Text-to-image and image-to-image with character consistency. Asynchronous task API; reference images via image_urls."
+
+[params.size]
+label = "Aspect Ratio"
+type = "select"
+default = "auto"
+optional = true
+options = [
+  { value = "auto",   label = "Auto" },
+  { value = "1:1",    label = "1:1 · Square" },
+  { value = "4:3",    label = "4:3 · Classic" },
+  { value = "3:4",    label = "3:4 · Portrait" },
+  { value = "3:2",    label = "3:2 · Landscape" },
+  { value = "2:3",    label = "2:3 · Portrait" },
+  { value = "16:9",   label = "16:9 · Landscape · Standard" },
+  { value = "9:16",   label = "9:16 · Vertical" },
+  { value = "2:1",    label = "2:1 · Wide" },
+  { value = "1:2",    label = "1:2 · Tall" },
+  { value = "19.5:9", label = "19.5:9 · Cinematic" },
+  { value = "9:19.5", label = "9:19.5 · Cinematic Vertical" },
+  { value = "20:9",   label = "20:9 · Ultrawide" },
+  { value = "9:20",   label = "9:20 · Tall Vertical" },
+]
+
+[params.resolution]
+label = "Resolution"
+type = "select"
+default = "1K"
+options = [
+  { value = "1K", label = "1K · Standard" },
+  { value = "2K", label = "2K · High Quality" },
+]
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "medium"
+options = [
+  { value = "low",    label = "Low · Fast" },
+  { value = "medium", label = "Medium · Default" },
+]
+
+[params.n]
+label = "Number of Images"
+type = "integer"
+default = 1
+optional = true

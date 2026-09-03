@@ -1,0 +1,62 @@
+id = "seedance-2.5-text-to-video"
+label = "Seedance 2.5 Text to Video"
+category = "VID"
+platform = "evolink"
+endpoint = "seedance-2.5-text-to-video"
+description = "ByteDance Seedance 2.5. Text-to-video with native audio. Asynchronous task API; reference images via image_urls."
+
+[params.duration]
+label = "Duration (seconds)"
+type = "integer"
+default = 5
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "720p"
+options = [
+  { value = "480p",  label = "480p · Fast" },
+  { value = "720p",  label = "720p · Standard" },
+  { value = "1080p", label = "1080p · Full HD" },
+]
+
+[params.aspect_ratio]
+label = "Aspect Ratio"
+type = "select"
+default = "adaptive"
+optional = true
+options = [
+  { value = "16:9",     label = "16:9 · Landscape" },
+  { value = "9:16",     label = "9:16 · Vertical" },
+  { value = "1:1",      label = "1:1 · Square" },
+  { value = "4:3",      label = "4:3 · Classic" },
+  { value = "3:4",      label = "3:4 · Portrait" },
+  { value = "21:9",     label = "21:9 · Ultrawide" },
+  { value = "adaptive", label = "Adaptive" },
+]
+
+[params.generate_audio]
+label = "Generate Audio"
+type = "boolean"
+default = true
+
+[params.content_filter]
+label = "Content Filter"
+type = "boolean"
+default = true
+hidden = true
+
+[params.output_format]
+label = "Output Format"
+type = "select"
+default = "mp4"
+options = [
+  { value = "mp4", label = "MP4 · Default" },
+  { value = "mov", label = "MOV" },
+]
+
+[params."model_params.web_search"]
+label = "Web Search Grounding"
+type = "boolean"
+default = false
+hidden = true

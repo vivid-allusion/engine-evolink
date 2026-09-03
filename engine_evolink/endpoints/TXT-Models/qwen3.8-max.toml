@@ -1,0 +1,26 @@
+id = "qwen3.8-max"
+label = "Qwen 3.8 Max"
+category = "TXT"
+platform = "evolink"
+endpoint = "qwen3.8-max"
+description = "Alibaba Qwen 3.8 Max. OpenAI-compatible chat completions with optional thinking mode (synchronous)."
+
+[params.enable_thinking]
+label = "Enable Thinking"
+type = "boolean"
+default = false
+
+[params.temperature]
+label = "Temperature"
+type = "number"
+default = 1.0
+
+[params.top_p]
+label = "Top P"
+type = "number"
+default = 1.0
+
+[params.max_completion_tokens]
+label = "Max Output Tokens"
+type = "integer"
+default = 4096

@@ -1,0 +1,49 @@
+id = "wan3.0-prime-image-to-video"
+label = "Wan 3.0 Prime Image to Video"
+category = "VID"
+platform = "evolink"
+endpoint = "wan3.0-prime-image-to-video"
+description = "Alibaba Wan 3.0 Prime. Image-to-video with optional first/last frames and native audio. Asynchronous task API."
+
+[general]
+reference_param = "image_start"
+
+[params.duration]
+label = "Duration (seconds)"
+type = "integer"
+default = 5
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "720p"
+options = [
+  { value = "480p",  label = "480p · Fast" },
+  { value = "720p",  label = "720p · Standard" },
+  { value = "1080p", label = "1080p · Full HD" },
+]
+
+[params.aspect_ratio]
+label = "Aspect Ratio"
+type = "select"
+default = "adaptive"
+optional = true
+options = [
+  { value = "adaptive", label = "Adaptive · Match Input" },
+  { value = "16:9",     label = "16:9 · Landscape" },
+  { value = "9:16",     label = "9:16 · Vertical" },
+  { value = "1:1",      label = "1:1 · Square" },
+  { value = "4:3",      label = "4:3 · Classic" },
+  { value = "3:4",      label = "3:4 · Portrait" },
+]
+
+[params.generate_audio]
+label = "Generate Audio"
+type = "boolean"
+default = true
+
+[params.seed]
+label = "Random Seed"
+type = "integer"
+optional = true
+hidden = true

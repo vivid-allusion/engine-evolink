@@ -1,0 +1,57 @@
+id = "seedream-5.0-pro"
+label = "Seedream 5.0 Pro"
+category = "IMG"
+platform = "evolink"
+endpoint = "doubao-seedream-5.0-pro"
+description = "Doubao Seedream 5.0 Pro. Text-to-image and image-to-image with layerize and transparent-background support. Asynchronous task API; reference images via image_urls."
+
+[params.size]
+label = "Aspect Ratio"
+type = "text"
+default = "auto"
+optional = true
+description = "Aspect ratio of the generated image (e.g. 16:9, 1:1, 9:16) or auto"
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "1K"
+options = [
+  { value = "1K",   label = "1K · Fast" },
+  { value = "1.5K", label = "1.5K · Balanced" },
+  { value = "2K",   label = "2K · High Quality" },
+]
+
+[params.prompt_priority]
+label = "Prompt Priority"
+type = "select"
+default = "standard"
+options = [
+  { value = "standard", label = "Standard" },
+  { value = "fast",     label = "Fast" },
+]
+
+[params.output_format]
+label = "Output Format"
+type = "select"
+default = "jpeg"
+options = [
+  { value = "jpeg", label = "JPEG · Default" },
+  { value = "png",  label = "PNG · Lossless" },
+]
+
+[params.watermark]
+label = "Watermark"
+type = "boolean"
+default = false
+hidden = true
+
+[params.background]
+label = "Background"
+type = "select"
+default = "opaque"
+hidden = true
+options = [
+  { value = "opaque",      label = "Opaque · Default" },
+  { value = "transparent", label = "Transparent" },
+]

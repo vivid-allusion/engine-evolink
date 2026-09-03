@@ -1,0 +1,52 @@
+id = "qwen-image-3.0-pro"
+label = "Qwen Image 3.0 Pro"
+category = "IMG"
+platform = "evolink"
+endpoint = "qwen-image-3.0-pro"
+description = "Alibaba Qwen Image 3.0 Pro. Text-to-image and image-to-image/editing with negative prompts and prompt extension. Asynchronous task API; reference images via image_urls."
+
+[params.n]
+label = "Number of Images"
+type = "integer"
+default = 1
+optional = true
+
+[params.negative_prompt]
+label = "Negative Prompt"
+type = "text"
+optional = true
+default = ""
+
+[params.size]
+label = "Aspect Ratio"
+type = "text"
+default = "auto"
+optional = true
+description = "Aspect ratio of the generated image (e.g. 16:9, 1:1, 9:16) or auto"
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "1K"
+options = [
+  { value = "1K", label = "1K · Standard" },
+  { value = "2K", label = "2K · High Quality" },
+]
+
+[params.prompt_extend]
+label = "Prompt Extension"
+type = "boolean"
+default = false
+hidden = true
+
+[params.watermark]
+label = "Watermark"
+type = "boolean"
+default = false
+hidden = true
+
+[params.seed]
+label = "Random Seed"
+type = "integer"
+optional = true
+hidden = true

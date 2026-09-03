@@ -1,0 +1,41 @@
+id = "veo3.1-pro"
+label = "Veo 3.1 Pro"
+category = "VID"
+platform = "evolink"
+endpoint = "veo3.1-pro-beta"
+description = "Google DeepMind Veo 3.1 Pro (beta). Text-to-video and first-last-frame video generation. Asynchronous task API; reference images via image_urls."
+
+[params.aspect_ratio]
+label = "Aspect Ratio"
+type = "select"
+default = "auto"
+optional = true
+options = [
+  { value = "auto", label = "Auto" },
+  { value = "16:9", label = "16:9 · Landscape" },
+  { value = "9:16", label = "9:16 · Vertical" },
+]
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "720p"
+options = [
+  { value = "720p", label = "720p" },
+]
+
+[params.generation_type]
+label = "Generation Type"
+type = "select"
+default = "TEXT"
+hidden = true
+options = [
+  { value = "TEXT",       label = "Text Only" },
+  { value = "FIRST&LAST", label = "First & Last Frame" },
+]
+
+[params.enhance_prompt]
+label = "Enhance Prompt"
+type = "boolean"
+default = true
+hidden = true

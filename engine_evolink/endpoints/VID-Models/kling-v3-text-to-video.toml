@@ -1,0 +1,62 @@
+id = "kling-v3-text-to-video"
+label = "Kling V3 Text to Video"
+category = "VID"
+platform = "evolink"
+endpoint = "kling-v3-text-to-video"
+description = "Kuaishou Kling V3. Text-to-video with optional sound effects, single-shot and multi-shot modes. Asynchronous task API."
+
+[params.negative_prompt]
+label = "Negative Prompt"
+type = "text"
+optional = true
+default = ""
+
+[params.duration]
+label = "Duration (seconds)"
+type = "integer"
+default = 5
+
+[params.aspect_ratio]
+label = "Aspect Ratio"
+type = "select"
+default = "16:9"
+options = [
+  { value = "16:9", label = "16:9 · Landscape" },
+  { value = "9:16", label = "9:16 · Vertical" },
+  { value = "1:1",  label = "1:1 · Square" },
+]
+
+[params.quality]
+label = "Quality"
+type = "select"
+default = "720p"
+options = [
+  { value = "720p",  label = "720p · Standard" },
+  { value = "1080p", label = "1080p · Full HD" },
+  { value = "4k",    label = "4K · Maximum" },
+]
+
+[params.sound]
+label = "Sound Effects"
+type = "select"
+default = "off"
+options = [
+  { value = "off", label = "Off · Default" },
+  { value = "on",  label = "On" },
+]
+
+[params."model_params.multi_shot"]
+label = "Multi-Shot Mode"
+type = "boolean"
+default = false
+hidden = true
+
+[params."model_params.shot_type"]
+label = "Shot Type"
+type = "select"
+default = "intelligence"
+hidden = true
+options = [
+  { value = "intelligence", label = "Intelligence" },
+  { value = "customize",    label = "Customize" },
+]

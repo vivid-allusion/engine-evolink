@@ -1,0 +1,62 @@
+id = "gpt-5.6-sol"
+label = "GPT 5.6 Sol"
+category = "TXT"
+platform = "evolink"
+endpoint = "gpt-5.6-sol"
+description = "OpenAI GPT 5.6 Sol via Evolink.AI. OpenAI-compatible chat completions (synchronous)."
+
+[params.reasoning_effort]
+label = "Reasoning Effort"
+type = "select"
+default = "medium"
+options = [
+  { value = "none",   label = "None · Fastest" },
+  { value = "low",    label = "Low" },
+  { value = "medium", label = "Medium · Default" },
+  { value = "high",   label = "High" },
+  { value = "xhigh",  label = "Extra High" },
+]
+
+[params.verbosity]
+label = "Verbosity"
+type = "select"
+default = "low"
+options = [
+  { value = "low",    label = "Low · Default" },
+  { value = "medium", label = "Medium" },
+  { value = "high",   label = "High" },
+]
+
+[params.temperature]
+label = "Temperature"
+type = "number"
+default = 0.7
+
+[params.top_p]
+label = "Top P"
+type = "number"
+default = 0.9
+
+[params.max_completion_tokens]
+label = "Max Output Tokens"
+type = "integer"
+default = 2048
+
+[params.frequency_penalty]
+label = "Frequency Penalty"
+type = "number"
+default = 0.5
+hidden = true
+
+[params.presence_penalty]
+label = "Presence Penalty"
+type = "number"
+default = 0.5
+hidden = true
+
+[params.prompt_cache_key]
+label = "Prompt Cache Key"
+type = "text"
+optional = true
+hidden = true
+default = ""
