@@ -207,7 +207,7 @@ class TestEngineImageTask:
         assert "Empty prompt" in results[0].error_msg
         session.post.assert_not_called()
 
-    def test_per_bullet_error_returns_error_outputfile(self, tmp_path):
+    def test_per_markdown_file_error_returns_error_outputfile(self, tmp_path):
         with _requests_mock() as (mock_requests, mock_session):
             mock_session.post.side_effect = RuntimeError("API timeout")
             full_profile = {"endpoint": "test/model", "media_type": "image"}
@@ -232,8 +232,8 @@ class TestEngineImageTask:
                 with patch("time.sleep"):
                     with patch("urllib.request.urlopen", return_value=_FakeStream(b"\x89PNG\r\n\x1a\npngdata")):
                         engine = Engine(full_profile, tmp_path)
-                        bullets = [InputFile(path=Path(f"b{i}.md"), prompt="test") for i in range(3)]
-                        results = engine.run(bullets)
+                        markdown_files = [InputFile(path=Path(f"b{i}.md"), prompt="test") for i in range(3)]
+                        results = engine.run(markdown_files)
         statuses = [r.status for r in results]
         assert statuses.count("ok") == 2
         assert statuses.count("error") == 1

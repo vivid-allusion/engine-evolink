@@ -19,7 +19,7 @@ discover this Engine, load it via `engine_loader.py`, and call
   stores: profile dict, output_dir, api_key, on_progress callback.
 - **`Engine.run(inputs: list[InputFile]) -> list[OutputFile]`** is the ONLY
   entry point Vehicles call. Returns ALL results — success and failure —
-  as OutputFile objects. Never raises for per-bullet failures.
+  as OutputFile objects. Never raises for per-Markdown-file failures.
 - **Error results carry `expected_path`**: the destination filename is
   precomputed BEFORE the API call (profile `output_format`/media default
   extension) so Vehicles can write error placeholders at the exact name.

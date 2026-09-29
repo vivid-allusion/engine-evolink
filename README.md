@@ -46,7 +46,7 @@ engine = Engine(profile=profile, output_dir="/tmp/out")
 
 inputs = [
     InputFile(
-        path=Path("bullet-001.md"),
+        path=Path("markdown-001.md"),
         prompt="a cinematic shot of a city at night",
         reference_urls=["https://example.com/ref.jpg"],
     ),
@@ -73,7 +73,7 @@ Evolink.AI is a multi-provider gateway. Media endpoints
 (`/v1/images/generations`, `/v1/videos/generations`, `/v1/audios/generations`)
 are **asynchronous tasks**: the POST returns a task ID, the Engine polls
 `GET /v1/tasks/{task_id}` until `completed` (result URLs, valid 24 hours —
-downloaded immediately) or `failed` (task error surfaced per bullet).
+downloaded immediately) or `failed` (task error surfaced per Markdown file).
 Language endpoints are OpenAI-compatible `POST /v1/chat/completions`
 (synchronous), used for `media_type` `text` and `vision`.
 
