@@ -2,10 +2,10 @@
 
 Engine wrapper for the [Evolink.AI](https://evolink.ai) API.
 
-Part of the [studiolot](https://github.com/vivid-allusion/studiolot) Vehicle /
+Part of the [studiolot](https://github.com/vivid-allusion/studiolot) Generator /
 Engine / SDK architecture. This repo wraps the Evolink.AI REST API behind the
-uniform interface that Vehicles (Frame Composer, Motion Conductor, etc.) call.
-The Vehicle never talks to Evolink.AI directly — it calls this Engine.
+uniform interface that Generators (Image Generator, Video Generator, etc.) call.
+The Generator never talks to Evolink.AI directly — it calls this Engine.
 
 See `docs/architecture/ENGINE_CONTRACT.md` in the studiolot repo for the full
 interface contract.

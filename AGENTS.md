@@ -1,15 +1,15 @@
 ## Architecture: Engine SDK Wrapper
 
 This repo is an **Engine** in the studiolot ecosystem. It wraps the
-**Evolink.AI** API and exposes a uniform interface that Vehicles call.
+**Evolink.AI** API and exposes a uniform interface that Generators call.
 
 ### The layers
 
 ```
-studiolot (TUI) → Vehicle (script) → **Evolink.AI Engine** → Provider API
+studiolot (TUI) → Generator (script) → **Evolink.AI Engine** → Provider API
 ```
 
-Vehicles like Frame Composer and Motion Conductor are SDK-agnostic. They
+Generators like Image Generator and Video Generator are SDK-agnostic. They
 discover this Engine, load it via `engine_loader.py`, and call
 `engine.run(inputs)`. This Engine handles all **Evolink.AI**-specific logic.
 
@@ -18,11 +18,11 @@ discover this Engine, load it via `engine_loader.py`, and call
 - **`Engine.__init__` is PURE.** No network I/O in the constructor. It only
   stores: profile dict, output_dir, api_key, on_progress callback.
 - **`Engine.run(inputs: list[InputFile]) -> list[OutputFile]`** is the ONLY
-  entry point Vehicles call. Returns ALL results — success and failure —
+  entry point Generators call. Returns ALL results — success and failure —
   as OutputFile objects. Never raises for per-Markdown-file failures.
 - **Error results carry `expected_path`**: the destination filename is
   precomputed BEFORE the API call (profile `output_format`/media default
-  extension) so Vehicles can write error placeholders at the exact name.
+  extension) so Generators can write error placeholders at the exact name.
 - **`EngineError`** is for unrecoverable pre-flight failures only: missing
   API key, invalid profile.
 - **`datatypes.py`** defines InputFile, OutputFile, ProgressEvent,
@@ -46,7 +46,7 @@ discover this Engine, load it via `engine_loader.py`, and call
 
 ### Engine discovery
 
-Vehicles find this Engine via `engine_loader.py`:
+Generators find this Engine via `engine_loader.py`:
 - Repo directory: `engine-evolink`
 - Python package: `engine_evolink`
 - `engine_loader.py` handles the hyphen→underscore mapping
