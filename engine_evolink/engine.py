@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .datatypes import EngineError, InputFile, OutputFile, ProgressEvent
+from .payload_builder import EvolinkPayloadBuilder
 
 _TASK_PATHS = {
     "image": "/v1/images/generations",
@@ -14,21 +15,12 @@ _TASK_PATHS = {
     "audio": "/v1/audios/generations",
 }
 
-_START_IMAGE_MODELS = {
-    "kling-v3-image-to-video",
-    "wan3.0-prime-image-to-video",
-    "wan3.0-image-to-video",
-    "wan2.7-image-to-video",
-    "wan2.6-image-to-video",
-    "wan2.5-image-to-video",
-}
-
 _CHAT_MEDIA_TYPES = {"text", "vision"}
 
 _DEFAULT_EXTENSIONS = {"image": ".png", "video": ".mp4", "audio": ".mp3", "text": ".txt", "vision": ".txt"}
 
 
-class Engine:
+class Engine(EvolinkPayloadBuilder):
     PLATFORM: str = "evolink"
     PROVIDER_NAME: str = "Evolink.AI"
     PROVIDER_HOMEPAGE: str = "https://evolink.ai"
@@ -67,6 +59,11 @@ class Engine:
 
         import requests
 
+        if self._concurrency > 1:
+            from . import runner
+
+            return runner.run_batch(self, inputs)
+
         session = requests.Session()
         session.headers["Authorization"] = f"Bearer {self._resolve_api_key()}"
 
@@ -74,11 +71,6 @@ class Engine:
         params = dict(self._profile.get("parameters", {}))
         media_type = self._profile.get("media_type", "") or "image"
         self._output_dir.mkdir(parents=True, exist_ok=True)
-
-        if self._concurrency > 1:
-            from . import runner
-
-            return runner.run_batch(self, inputs)
 
         results: list[OutputFile] = []
         total = len(inputs)
@@ -238,55 +230,6 @@ class Engine:
         if not content:
             raise RuntimeError("Empty content in Evolink.AI chat response")
         return content
-
-    def _build_messages(self, prompt: str, item: InputFile, media_type: str) -> list[dict]:
-        system = self._profile.get("system_prompt", "")
-        messages: list[dict] = []
-        if system:
-            messages.append({"role": "system", "content": system})
-        if media_type == "vision" and item.reference_urls:
-            content_blocks: list[dict] = [{"type": "text", "text": prompt}]
-            for url in item.reference_urls:
-                content_blocks.append({"type": "image_url", "image_url": {"url": url}})
-            messages.append({"role": "user", "content": content_blocks})
-        else:
-            messages.append({"role": "user", "content": prompt})
-        return messages
-
-    def _build_task_payload(self, params: dict, prompt: str, item: InputFile, endpoint: str) -> dict:
-        payload = self._split_nested(params, {"prompt_prefix", "prompt_suffix"})
-        payload["model"] = endpoint
-        payload["prompt"] = prompt
-        ref_key = self._reference_param(endpoint)
-        if item.reference_urls and ref_key == "image_start":
-            payload["image_start"] = item.reference_urls[0]
-            if len(item.reference_urls) > 1:
-                payload["image_end"] = item.reference_urls[1]
-        elif item.reference_urls and ref_key:
-            payload[ref_key] = item.reference_urls
-        return payload
-
-    def _reference_param(self, endpoint: str) -> str:
-        explicit = self._profile.get("reference_param")
-        if explicit:
-            return explicit
-        if endpoint in _START_IMAGE_MODELS:
-            return "image_start"
-        return "image_urls"
-
-    def _split_nested(self, params: dict, skips: set) -> dict:
-        out: dict = {}
-        for key, value in params.items():
-            if key in skips:
-                continue
-            if isinstance(key, str) and "." in key:
-                head, tail = key.split(".", 1)
-                bucket = out.setdefault(head, {})
-                if isinstance(bucket, dict):
-                    bucket[tail] = value
-            else:
-                out[key] = value
-        return out
 
     def _save_results(
         self,
