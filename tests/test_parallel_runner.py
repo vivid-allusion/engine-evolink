@@ -66,7 +66,7 @@ def run_engine(profile, out_dir, behavior, n=3, frozen=True):
     mock_session = MagicMock()
     mock_requests.Session.return_value = mock_session
     recorder = []
-    watch = {"cur": 0, "max": 0, "lock": threading.Lock()}
+    watch = {"cur": 0, "max": 0, "calls": 0, "lock": threading.Lock()}
 
     def saved_outputs(engine_args):
         from engine_evolink.datatypes import OutputFile
@@ -89,16 +89,17 @@ def run_engine(profile, out_dir, behavior, n=3, frozen=True):
         return _saved_paths(engine, items)
 
     real_run_item = runner_module.run_item
-    def watching(engine, session, item, idx, total):
+    def watching(engine, session, item, idx, total, state):
         with watch["lock"]:
             watch["cur"] += 1
+            watch["calls"] += 1
             watch["max"] = max(watch["max"], watch["cur"])
         try:
             time.sleep(0.02 + (hash(threading.current_thread()) % 11) * 0.002)
             raise_ = behavior(index=idx, item=item)
             if raise_ is not None:
                 session = _stub_session(raise_)
-                return real_run_item(engine, session, item, idx, total)
+                return real_run_item(engine, session, item, idx, total, state)
             from engine_evolink.datatypes import OutputFile
 
             return [
@@ -137,6 +138,7 @@ def run_engine(profile, out_dir, behavior, n=3, frozen=True):
             seq_results = engine.run(inputs_stub(n))
             with patch("engine_evolink.runner.run_item", watching):
                 par_results = engine.run(items)
+    watch["progress"] = recorder
     return seq_results, par_results, watch
 
 
@@ -190,3 +192,27 @@ class TestParallelRunner:
             engine = Engine(base_profile(concurrency=1.5), tmp_path)
             with pytest.raises(EngineError, match="concurrency"):
                 engine.run([])
+
+    def test_retryable_failures_trip_breaker_and_leave_unstarted_absent(self, tmp_path):
+        def limited(index, item):
+            error = RuntimeError("429 Too Many Requests")
+            error.status_code = 429
+            return error
+
+        _, results, watch = run_engine(
+            base_profile(
+                concurrency=2,
+                retry_on_429=0,
+                circuit_breaker_max=2,
+            ),
+            tmp_path,
+            limited,
+            n=6,
+        )
+        assert watch["calls"] <= 3
+        assert len(results) == watch["calls"]
+        assert all(result.status == "error" for result in results)
+        assert any(
+            "Circuit breaker tripped" in str(event)
+            for event in watch["progress"]
+        )
