@@ -89,7 +89,7 @@ def run_engine(profile, out_dir, behavior, n=3, frozen=True):
         return _saved_paths(engine, items)
 
     real_run_item = runner_module.run_item
-    def watching(engine, session, item, idx, total, state):
+    def watching(engine, session, item, idx, total):
         with watch["lock"]:
             watch["cur"] += 1
             watch["max"] = max(watch["max"], watch["cur"])
@@ -98,7 +98,7 @@ def run_engine(profile, out_dir, behavior, n=3, frozen=True):
             raise_ = behavior(index=idx, item=item)
             if raise_ is not None:
                 session = _stub_session(raise_)
-                return real_run_item(engine, session, item, idx, total, state)
+                return real_run_item(engine, session, item, idx, total)
             from engine_evolink.datatypes import OutputFile
 
             return [

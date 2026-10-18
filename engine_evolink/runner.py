@@ -5,34 +5,17 @@
 reuses this engine's existing machinery verbatim (the sequential body's
 chat and task branches) — same retry, polling and error semantics.
 Results are written by input index; a failing item never disturbs jobs
-still in flight; the stop flag exists for the mirror-shape contract
-(this engine's dispatcher has no breaker to trip from its per-item code).
+still in flight (each failure is converted inside run_item by this
+engine's own handler). This engine's sequential body has no circuit
+breaker, so the mirror carries no stop state.
 """
 
 import concurrent.futures
-import threading
 
 from .datatypes import OutputFile
 
 
-class BatchState:
-    def __init__(self):
-        self._lock = threading.Lock()
-        self._stop = False
-
-    def is_stopped(self) -> bool:
-        with self._lock:
-            return self._stop
-
-    def halt(self):
-        with self._lock:
-            self._stop = True
-
-    def note_success(self):
-        pass
-
-
-def run_item(engine, session, item, idx, total, state) -> list[OutputFile]:
+def run_item(engine, session, item, idx, total) -> list[OutputFile]:
     from engine_evolink.engine import _CHAT_MEDIA_TYPES
 
     stem = item.path.stem
@@ -62,12 +45,23 @@ def run_item(engine, session, item, idx, total, state) -> list[OutputFile]:
     try:
         if media_type in _CHAT_MEDIA_TYPES:
             engine._emit(f"{prefix} 📡 Calling {engine.PROVIDER_NAME} chat API...")
-            content = engine._run_chat(session, engine._profile["endpoint"], dict(engine._profile.get("parameters", {})), prompt, item, media_type)
+            content = engine._run_chat(
+                session,
+                engine._profile["endpoint"],
+                dict(engine._profile.get("parameters", {})),
+                prompt,
+                item,
+                media_type,
+            )
             dest = dest_dir / f"{ts}-{stem}-{idx}.txt"
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_text(content, encoding="utf-8")
-            engine._emit(f"{prefix} 💾 Saved: {dest.name}", current=current, total=total, saved_path=dest)
-            state.note_success()
+            engine._emit(
+                f"{prefix} 💾 Saved: {dest.name}",
+                current=current,
+                total=total,
+                saved_path=dest,
+            )
             return [
                 OutputFile(
                     source_path=item.path,
@@ -78,8 +72,15 @@ def run_item(engine, session, item, idx, total, state) -> list[OutputFile]:
             ]
 
         engine._emit(f"{prefix} 📡 Calling {engine.PROVIDER_NAME} API...")
-        payload = engine._build_task_payload(dict(engine._profile.get("parameters", {})), prompt, item, engine._profile["endpoint"])
-        saved = engine._run_task(session, payload, media_type, stem, idx, prefix, current, total, rel_dir, expected)
+        payload = engine._build_task_payload(
+            dict(engine._profile.get("parameters", {})),
+            prompt,
+            item,
+            engine._profile["endpoint"],
+        )
+        saved = engine._run_task(
+            session, payload, media_type, stem, idx, prefix, current, total, rel_dir, expected
+        )
         if not saved:
             return [
                 OutputFile(
@@ -90,7 +91,6 @@ def run_item(engine, session, item, idx, total, state) -> list[OutputFile]:
                     expected_path=expected,
                 )
             ]
-        state.note_success()
         return [
             OutputFile(
                 source_path=item.path,
@@ -120,21 +120,16 @@ def run_batch(engine, inputs) -> list[OutputFile]:
     session = requests.Session()
     session.headers["Authorization"] = f"Bearer {engine._resolve_api_key()}"
 
-    state = BatchState()
     results: list[list[OutputFile] | None] = [None] * len(inputs)
     inflight_cap = max(1, engine._concurrency)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=inflight_cap) as pool:
         pending: dict[concurrent.futures.Future, int] = {}
         next_idx = 0
-        while pending or (next_idx < len(inputs) and not state.is_stopped()):
-            while (
-                not state.is_stopped()
-                and next_idx < len(inputs)
-                and len(pending) < inflight_cap
-            ):
+        while pending or next_idx < len(inputs):
+            while next_idx < len(inputs) and len(pending) < inflight_cap:
                 future = pool.submit(
-                    run_item, engine, session, inputs[next_idx], next_idx, len(inputs), state
+                    run_item, engine, session, inputs[next_idx], next_idx, len(inputs)
                 )
                 pending[future] = next_idx
                 next_idx += 1
