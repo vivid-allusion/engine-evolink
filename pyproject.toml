@@ -3,6 +3,7 @@ name = "engine-evolink"
 version = "0.1.0"
 description = "Engine wrapper for the Evolink.AI API. Uniform interface that studiolot Generators call instead of talking to the provider directly."
 requires-python = ">=3.10"
+license = { text = "MIT" }
 dependencies = [
     "requests>=2.28",
 ]
