@@ -26,12 +26,6 @@ type = "select"
 default = "adaptive"
 optional = true
 options = [
-  { value = "16:9",     label = "16:9 · Landscape" },
-  { value = "9:16",     label = "9:16 · Vertical" },
-  { value = "1:1",      label = "1:1 · Square" },
-  { value = "4:3",      label = "4:3 · Classic" },
-  { value = "3:4",      label = "3:4 · Portrait" },
-  { value = "21:9",     label = "21:9 · Ultrawide" },
   { value = "adaptive", label = "Adaptive" },
 ]
 
