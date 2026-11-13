@@ -32,7 +32,7 @@ def _load_all() -> dict[str, list[dict]]:
 def test_catalog_not_empty():
     catalog = _load_all()
     assert len(catalog["IMG"]) == 8
-    assert len(catalog["VID"]) == 6
+    assert len(catalog["VID"]) == 8
     assert len(catalog["TXT"]) == 7
     assert len(catalog["VISION"]) == 2
 

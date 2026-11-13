@@ -1,7 +1,15 @@
 """Evolink payload and message shaping.
 """
 
+import posixpath
+from urllib.parse import urlparse
+
 from .datatypes import InputFile
+
+_REFERENCE_LISTS = {
+    ".mp4": "video_urls", ".mov": "video_urls",
+    ".mp3": "audio_urls", ".wav": "audio_urls",
+}
 
 _START_IMAGE_MODELS = {
     "kling-v3-image-to-video",
@@ -39,6 +47,10 @@ class EvolinkPayloadBuilder:
             payload["image_start"] = item.reference_urls[0]
             if len(item.reference_urls) > 1:
                 payload["image_end"] = item.reference_urls[1]
+        elif item.reference_urls and endpoint == "seedance-2.5-reference-to-video":
+            for url in item.reference_urls:
+                ext = posixpath.splitext(urlparse(url).path.lower())[1]
+                payload.setdefault(_REFERENCE_LISTS.get(ext, "image_urls"), []).append(url)
         elif item.reference_urls and ref_key:
             payload[ref_key] = item.reference_urls
         return payload

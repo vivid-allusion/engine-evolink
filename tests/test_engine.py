@@ -552,3 +552,28 @@ class TestImports:
         from engine_evolink import list_standby_profiles
 
         assert list_standby_profiles() == []
+
+
+class TestSeedanceModes:
+    def _payload(self, endpoint, urls):
+        engine = Engine({"endpoint": endpoint, "media_type": "video"}, "/tmp", api_key="k")
+        return engine._build_task_payload({}, "p", InputFile(path=Path("b.md"), prompt="p", reference_urls=urls), endpoint)
+
+    def test_image_to_video_sends_start_then_end_frame(self):
+        urls = ["https://x/a.png", "https://x/b.jpg"]
+        assert self._payload("seedance-2.5-image-to-video", urls)["image_urls"] == urls
+
+    def test_reference_to_video_splits_by_file_type(self):
+        urls = ["https://x/a.png", "https://x/m.MP4?sig=1", "https://x/s.wav", "https://x/c.webp", "https://x/n.mov", "https://x/t.mp3"]
+        p = self._payload("seedance-2.5-reference-to-video", urls)
+        assert p["image_urls"] == ["https://x/a.png", "https://x/c.webp"]
+        assert p["video_urls"] == ["https://x/m.MP4?sig=1", "https://x/n.mov"]
+        assert p["audio_urls"] == ["https://x/s.wav", "https://x/t.mp3"]
+
+    def test_reference_to_video_sound_only_has_no_image_urls(self):
+        p = self._payload("seedance-2.5-reference-to-video", ["https://x/s.mp3"])
+        assert p["audio_urls"] == ["https://x/s.mp3"] and "image_urls" not in p
+
+    def test_text_to_video_without_media_sends_no_lists(self):
+        p = self._payload("seedance-2.5-text-to-video", [])
+        assert not any(k.endswith("_urls") for k in p)
