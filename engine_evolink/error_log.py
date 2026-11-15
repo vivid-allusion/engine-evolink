@@ -45,7 +45,7 @@ def _write(engine, item, idx, total, expected, stage, msg, prompt, payload, made
             "traceback:",
             "".join(traceback.format_exception(error)).rstrip() if error else "n/a",
             "api payload:",
-            _mask(payload),
+            _mask(payload if payload is not None else made.get("request")),
         ]
         path.write_text("\n".join(lines) + "\n", encoding="utf-8")
         return path

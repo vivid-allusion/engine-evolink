@@ -103,6 +103,7 @@ def run_item(engine, session, item, idx, total, state) -> list[OutputFile]:
                 prompt,
                 item,
                 media_type,
+                made,
             )
             dest = dest_dir / f"{ts}-{stem}-{idx}.txt"
             dest.parent.mkdir(parents=True, exist_ok=True)

@@ -101,7 +101,7 @@ class Engine(EvolinkPayloadBuilder):
             try:
                 if media_type in _CHAT_MEDIA_TYPES:
                     self._emit(f"{prefix} 📡 Calling Evolink.AI chat API...")
-                    content = self._run_chat(session, endpoint, params, prompt, item, media_type)
+                    content = self._run_chat(session, endpoint, params, prompt, item, media_type, made)
                     dest = dest_dir / f"{ts}-{stem}-{idx}.txt"
                     dest.parent.mkdir(parents=True, exist_ok=True)
                     dest.write_text(content, encoding="utf-8")
@@ -207,10 +207,13 @@ class Engine(EvolinkPayloadBuilder):
         prompt: str,
         item: InputFile,
         media_type: str,
+        made: dict | None = None,
     ) -> str:
         body = self._split_nested(params, {"prompt_prefix", "prompt_suffix"})
         body["model"] = endpoint
         body["messages"] = self._build_messages(prompt, item, media_type)
+        if made is not None:
+            made["request"] = body
         response = session.post(f"{self._base_url}/v1/chat/completions", json=body, timeout=120)
         if not response.ok:
             raise RuntimeError(self._error_text(response, f"Evolink.AI HTTP {response.status_code}"))

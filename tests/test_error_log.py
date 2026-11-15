@@ -55,3 +55,18 @@ def test_log_write_failure_never_raises(tmp_path):
     with patch("engine_evolink.error_log._mask", side_effect=OSError):
         r = _run(tmp_path, 1, prompt="")
     assert r.status == "error" and r.metadata == {}
+
+
+def test_failed_chat_item_logs_masked_request(tmp_path):
+    profile = {"endpoint": "chat-m", "media_type": "text", "parameters": {"api_key": "sk-secret"}}
+    src = tmp_path / "S01.md"
+    src.write_text("hello")
+    sess = MagicMock()
+    sess.post.return_value = _Resp({"choices": []})
+    fake = MagicMock()
+    fake.Session.return_value = sess
+    with patch.dict("sys.modules", {"requests": fake}):
+        r = Engine(profile, tmp_path / "out", api_key="k").run([InputFile(path=src, prompt="hello")])[0]
+    text = Path(r.metadata["error_log"]).read_text()
+    assert '"model": "chat-m"' in text and "hello" in text and "***MASKED***" in text
+    assert "sk-secret" not in text
