@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .datatypes import EngineError, InputFile, OutputFile, ProgressEvent
+from .error_log import error_result
 from .payload_builder import EvolinkPayloadBuilder
 
 _TASK_PATHS = {
@@ -87,19 +88,16 @@ class Engine(EvolinkPayloadBuilder):
 
             prompt = f"{self._prefix}{item.prompt}{self._suffix}".strip()
             if not prompt:
-                results.append(
-                    OutputFile(
-                        source_path=item.path,
-                        status="error",
-                        error_msg="Empty prompt after applying prefix/suffix",
-                        media_type=media_type,
-                        expected_path=expected,
-                    )
-                )
+                results.append(error_result(
+                    self, item, idx, total, media_type, expected, "empty_prompt",
+                    "Empty prompt after applying prefix/suffix", prompt=prompt,
+                ))
                 continue
 
             self._emit(f"{prefix} 📝 Prompt: {prompt}")
 
+            payload = None
+            made: dict = {}
             try:
                 if media_type in _CHAT_MEDIA_TYPES:
                     self._emit(f"{prefix} 📡 Calling Evolink.AI chat API...")
@@ -120,17 +118,12 @@ class Engine(EvolinkPayloadBuilder):
 
                 self._emit(f"{prefix} 📡 Calling Evolink.AI API...")
                 payload = self._build_task_payload(params, prompt, item, endpoint)
-                saved = self._run_task(session, payload, media_type, stem, idx, prefix, current, total, rel_dir, expected)
+                saved = self._run_task(session, payload, media_type, stem, idx, prefix, current, total, rel_dir, expected, made)
                 if not saved:
-                    results.append(
-                        OutputFile(
-                            source_path=item.path,
-                            status="error",
-                            error_msg="No output returned from Evolink.AI",
-                            media_type=media_type,
-                            expected_path=expected,
-                        )
-                    )
+                    results.append(error_result(
+                        self, item, idx, total, media_type, expected, "no_output",
+                        "No output returned from Evolink.AI", prompt=prompt, payload=payload, made=made,
+                    ))
                 else:
                     for saved_path in saved:
                         results.append(
@@ -146,15 +139,10 @@ class Engine(EvolinkPayloadBuilder):
 
             except Exception as exc:
                 self._emit(f"{prefix} Error: {exc}", level="error", current=current, total=total)
-                results.append(
-                    OutputFile(
-                        source_path=item.path,
-                        status="error",
-                        error_msg=str(exc),
-                        media_type=media_type,
-                        expected_path=expected,
-                    )
-                )
+                results.append(error_result(
+                    self, item, idx, total, media_type, expected, "provider_call",
+                    str(exc), prompt=prompt, payload=payload, made=made, error=exc,
+                ))
 
         return results
 
@@ -173,7 +161,9 @@ class Engine(EvolinkPayloadBuilder):
         total: int,
         rel_dir: str,
         expected: Path,
+        made: dict | None = None,
     ) -> list[Path]:
+        made = {} if made is None else made
         task_path = _TASK_PATHS.get(media_type, _TASK_PATHS["image"])
         response = session.post(f"{self._base_url}{task_path}", json=payload, timeout=60)
         if not response.ok:
@@ -182,6 +172,7 @@ class Engine(EvolinkPayloadBuilder):
         task_id = body.get("id") or body.get("task_id")
         if not task_id:
             raise RuntimeError("No task ID in Evolink.AI response")
+        made["task_id"] = task_id
         self._emit(f"{prefix} ⏳ Task created: {task_id}")
 
         started = time.monotonic()
@@ -194,6 +185,7 @@ class Engine(EvolinkPayloadBuilder):
                 raise RuntimeError(self._error_text(task_response, f"Task poll HTTP {task_response.status_code}"))
             task = task_response.json()
             status = task.get("status", "")
+            made["task"] = task
             progress = task.get("progress")
             if progress != last_progress:
                 last_progress = progress

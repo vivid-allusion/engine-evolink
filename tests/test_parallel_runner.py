@@ -126,7 +126,7 @@ def run_engine(profile, out_dir, behavior, n=3, frozen=True):
             engine = Engine(profile, out_dir, on_progress=recorder.append)
             items = inputs_stub(n)
 
-            def seq_task(session, payload, media_type, stem, idx, prefix, current, total, rel_dir, expected):
+            def seq_task(session, payload, media_type, stem, idx, prefix, current, total, rel_dir, expected, made=None):
                 raise_ = behavior(index=idx, item=items[idx])
                 if raise_ is not None:
                     raise raise_

@@ -15,6 +15,7 @@ import concurrent.futures
 import threading
 
 from .datatypes import OutputFile
+from .error_log import error_result
 from .retry_policy import RetryingSession, classify_error
 
 
@@ -83,18 +84,15 @@ def run_item(engine, session, item, idx, total, state) -> list[OutputFile]:
 
     prompt = f"{engine._prefix}{item.prompt}{engine._suffix}".strip()
     if not prompt:
-        return [
-            OutputFile(
-                source_path=item.path,
-                status="error",
-                error_msg="Empty prompt after applying prefix/suffix",
-                media_type=media_type,
-                expected_path=expected,
-            )
-        ]
+        return [error_result(
+            engine, item, idx, total, media_type, expected, "empty_prompt",
+            "Empty prompt after applying prefix/suffix", prompt=prompt,
+        )]
 
     engine._emit(f"{prefix} 📝 Prompt: {prompt}")
 
+    payload = None
+    made: dict = {}
     try:
         if media_type in _CHAT_MEDIA_TYPES:
             engine._emit(f"{prefix} 📡 Calling {engine.PROVIDER_NAME} chat API...")
@@ -133,18 +131,13 @@ def run_item(engine, session, item, idx, total, state) -> list[OutputFile]:
             engine._profile["endpoint"],
         )
         saved = engine._run_task(
-            session, payload, media_type, stem, idx, prefix, current, total, rel_dir, expected
+            session, payload, media_type, stem, idx, prefix, current, total, rel_dir, expected, made
         )
         if not saved:
-            return [
-                OutputFile(
-                    source_path=item.path,
-                    status="error",
-                    error_msg="No output returned from Evolink.AI",
-                    media_type=media_type,
-                    expected_path=expected,
-                )
-            ]
+            return [error_result(
+                engine, item, idx, total, media_type, expected, "no_output",
+                "No output returned from Evolink.AI", prompt=prompt, payload=payload, made=made,
+            )]
         state.note_success()
         return [
             OutputFile(
@@ -159,15 +152,10 @@ def run_item(engine, session, item, idx, total, state) -> list[OutputFile]:
     except Exception as exc:
         _record_failure(engine, state, exc, prefix)
         engine._emit(f"{prefix} Error: {exc}", level="error", current=current, total=total)
-        return [
-            OutputFile(
-                source_path=item.path,
-                status="error",
-                error_msg=str(exc),
-                media_type=media_type,
-                expected_path=expected,
-            )
-        ]
+        return [error_result(
+            engine, item, idx, total, media_type, expected, "provider_call",
+            str(exc), prompt=prompt, payload=payload, made=made, error=exc,
+        )]
 
 
 def run_batch(engine, inputs) -> list[OutputFile]:
