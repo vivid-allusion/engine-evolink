@@ -577,3 +577,26 @@ class TestSeedanceModes:
     def test_text_to_video_without_media_sends_no_lists(self):
         p = self._payload("seedance-2.5-text-to-video", [])
         assert not any(k.endswith("_urls") for k in p)
+
+
+class TestAtomicSave:
+    def _save(self, tmp_path):
+        engine = Engine({"endpoint": "test/model", "media_type": "image"}, tmp_path, api_key="k")
+        with patch("urllib.request.urlopen", return_value=_FakeStream(b"\x89PNG\r\n\x1a\npngdata")):
+            return engine._save_results(["https://x/a.png"], "image", "b", 1, "", 1, 1, "")
+
+    def test_failed_write_leaves_no_file(self, tmp_path):
+        with patch("builtins.open", side_effect=OSError("disk full")):
+            with pytest.raises(OSError):
+                self._save(tmp_path)
+        assert list(tmp_path.iterdir()) == []
+
+    def test_failed_move_removes_temporary_file(self, tmp_path):
+        with patch("os.replace", side_effect=OSError("boom")):
+            with pytest.raises(OSError):
+                self._save(tmp_path)
+        assert list(tmp_path.iterdir()) == []
+
+    def test_good_save_leaves_only_final_file(self, tmp_path):
+        saved = self._save(tmp_path)
+        assert list(tmp_path.iterdir()) == saved

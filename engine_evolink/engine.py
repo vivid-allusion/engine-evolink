@@ -254,8 +254,14 @@ class Engine(EvolinkPayloadBuilder):
             ext = self._sniff_extension(data, media_type)
             suffix = "" if len(urls) == 1 else f"_{i}"
             dest = dest_dir / f"{ts}-{stem}-{idx}{suffix}{ext}"
-            with open(dest, "wb") as f:
-                f.write(data)
+            part = dest.with_name(f".{dest.name}.part")
+            try:
+                with open(part, "wb") as f:
+                    f.write(data)
+                os.replace(part, dest)
+            except BaseException:
+                part.unlink(missing_ok=True)
+                raise
             self._emit(
                 f"{prefix} 💾 Saved: {dest.name}",
                 current=current,
